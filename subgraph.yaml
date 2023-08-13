@@ -1,0 +1,57 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Diamond
+    network: mbase
+    source:
+      address: "0xaB1af0772A7e709B864e7B8F14aB70bc7ea2ad97"
+      abi: Diamond
+      startBlock: 4834376
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AuctionBid_Displaced
+        - AuctionBid_Placed
+        - AuctionRegistration_EndTimeUpdated
+        - AuctionRegistration_NewAuction
+        - Auction_Claimed
+        - Currency_AddressUpdated
+        - Currency_DefaultUpdated
+        - Currency_NameUpdated
+        - GBMPreset_DefaultUpdated
+        - GBMPreset_Updated
+        - SaleExecuted
+        - SaleRegistration_NewSale
+      abis:
+        - name: Diamond
+          file: ./abis/Diamond.json
+      eventHandlers:
+        - event: AuctionBid_Displaced(indexed uint256,indexed uint256,address,uint256,uint256)
+          handler: handleAuctionBid_Displaced
+        - event: AuctionBid_Placed(indexed uint256,indexed uint256,address,uint256,uint256,uint256)
+          handler: handleAuctionBid_Placed
+        - event: AuctionRegistration_EndTimeUpdated(indexed uint256,uint256)
+          handler: handleAuctionRegistration_EndTimeUpdated
+        - event: AuctionRegistration_NewAuction(indexed uint256,indexed address,indexed uint256,uint256,bytes4,uint256,uint256,uint256,uint256,address,uint256)
+          handler: handleAuctionRegistration_NewAuction
+        - event: Auction_Claimed(indexed uint256,address,uint256,uint256,bytes4,address,uint256,uint256,address)
+          handler: handleAuction_Claimed
+        - event: Currency_AddressUpdated(indexed uint256,address)
+          handler: handleCurrency_AddressUpdated
+        - event: Currency_DefaultUpdated(indexed uint256,address,string)
+          handler: handleCurrency_DefaultUpdated
+        - event: Currency_NameUpdated(indexed uint256,string)
+          handler: handleCurrency_NameUpdated
+        - event: GBMPreset_DefaultUpdated(indexed uint256)
+          handler: handleGBMPreset_DefaultUpdated
+        - event: GBMPreset_Updated(indexed uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,string)
+          handler: handleGBMPreset_Updated
+        - event: SaleExecuted(indexed uint256,indexed address,indexed uint256,uint256,uint256,uint256,uint256)
+          handler: handleSaleExecuted
+        - event: SaleRegistration_NewSale(indexed uint256,indexed address,indexed uint256,uint256,bytes4,address,uint256,uint256,address,uint256,uint256)
+          handler: handleSaleRegistration_NewSale
+      file: ./src/diamond.ts

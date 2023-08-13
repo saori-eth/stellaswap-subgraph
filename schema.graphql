@@ -1,0 +1,152 @@
+type AuctionBid_Displaced @entity(immutable: true) {
+  id: Bytes!
+  saleID: BigInt! # uint256
+  bidIndex: BigInt! # uint256
+  bidder: Bytes! # address
+  bidamount: BigInt! # uint256
+  incentivesPaid: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AuctionBid_Placed @entity(immutable: true) {
+  id: Bytes!
+  saleID: BigInt! # uint256
+  bidIndex: BigInt! # uint256
+  bidder: Bytes! # address
+  bidamount: BigInt! # uint256
+  incentivesDue: BigInt! # uint256
+  bidTimestamp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AuctionRegistration_EndTimeUpdated @entity(immutable: true) {
+  id: Bytes!
+  saleID: BigInt! # uint256
+  endTimeStamp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AuctionRegistration_NewAuction @entity(immutable: true) {
+  id: Bytes!
+  saleID: BigInt! # uint256
+  tokenContractAddress: Bytes! # address
+  tokenID: BigInt! # uint256
+  tokenAmount: BigInt! # uint256
+  tokenKind: Bytes! # bytes4
+  gbmPresetIndex: BigInt! # uint256
+  currencyID: BigInt! # uint256
+  startTimestamp: BigInt! # uint256
+  endTimeStamp: BigInt! # uint256
+  beneficiary: Bytes! # address
+  startingBid: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Auction_Claimed @entity(immutable: true) {
+  id: Bytes!
+  saleID: BigInt! # uint256
+  tokenContractAddress: Bytes! # address
+  tokenID: BigInt! # uint256
+  tokenAmount: BigInt! # uint256
+  tokenKind: Bytes! # bytes4
+  beneficiary: Bytes! # address
+  winningBidAmount: BigInt! # uint256
+  winningBidCurrencyIndex: BigInt! # uint256
+  winner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Currency_AddressUpdated @entity(immutable: true) {
+  id: Bytes!
+  currencyIndex: BigInt! # uint256
+  currencyAddress: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Currency_DefaultUpdated @entity(immutable: true) {
+  id: Bytes!
+  currencyIndex: BigInt! # uint256
+  currencyAddress: Bytes! # address
+  currencyName: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Currency_NameUpdated @entity(immutable: true) {
+  id: Bytes!
+  currencyIndex: BigInt! # uint256
+  currencyName: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type GBMPreset_DefaultUpdated @entity(immutable: true) {
+  id: Bytes!
+  presetID: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type GBMPreset_Updated @entity(immutable: true) {
+  id: Bytes!
+  presetID: BigInt! # uint256
+  auctionDuration: BigInt! # uint256
+  hammerTimeDuration: BigInt! # uint256
+  cancellationPeriodDuration: BigInt! # uint256
+  stepMin: BigInt! # uint256
+  incentiveMin: BigInt! # uint256
+  incentiveMax: BigInt! # uint256
+  incentiveGrowthMultiplier: BigInt! # uint256
+  firstMinBid: BigInt! # uint256
+  presetName: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SaleExecuted @entity(immutable: true) {
+  id: Bytes!
+  saleID: BigInt! # uint256
+  tokenContractAddress: Bytes! # address
+  tokenID: BigInt! # uint256
+  tokenAmount: BigInt! # uint256
+  price: BigInt! # uint256
+  leftoverTokens: BigInt! # uint256
+  leftoverPrice: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SaleRegistration_NewSale @entity(immutable: true) {
+  id: Bytes!
+  saleID: BigInt! # uint256
+  tokenContractAddress: Bytes! # address
+  tokenID: BigInt! # uint256
+  tokenAmount: BigInt! # uint256
+  tokenKind: Bytes! # bytes4
+  tokenOrigin: Bytes! # address
+  price: BigInt! # uint256
+  currencyID: BigInt! # uint256
+  beneficiary: Bytes! # address
+  startTimestamp: BigInt! # uint256
+  endTimestamp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
