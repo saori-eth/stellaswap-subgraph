@@ -1,3 +1,5 @@
+import { ethereum, Bytes, BigInt, ByteArray } from "@graphprotocol/graph-ts"
+import { log } from "matchstick-as"
 import {
   AuctionBid_Displaced as AuctionBid_DisplacedEvent,
   AuctionBid_Placed as AuctionBid_PlacedEvent,
@@ -7,25 +9,30 @@ import {
   Currency_AddressUpdated as Currency_AddressUpdatedEvent,
   Currency_DefaultUpdated as Currency_DefaultUpdatedEvent,
   Currency_NameUpdated as Currency_NameUpdatedEvent,
+  Diamond,
   GBMPreset_DefaultUpdated as GBMPreset_DefaultUpdatedEvent,
   GBMPreset_Updated as GBMPreset_UpdatedEvent,
   SaleExecuted as SaleExecutedEvent,
   SaleRegistration_NewSale as SaleRegistration_NewSaleEvent
 } from "../generated/Diamond/Diamond"
 import {
+  Auction,
   AuctionBid_Displaced,
   AuctionBid_Placed,
   AuctionRegistration_EndTimeUpdated,
   AuctionRegistration_NewAuction,
   Auction_Claimed,
+  Bid,
   Currency_AddressUpdated,
   Currency_DefaultUpdated,
   Currency_NameUpdated,
   GBMPreset_DefaultUpdated,
   GBMPreset_Updated,
+  Project,
   SaleExecuted,
   SaleRegistration_NewSale
 } from "../generated/schema"
+import { ERC721 } from "../generated/ERC721/ERC721"
 
 export function handleAuctionBid_Displaced(
   event: AuctionBid_DisplacedEvent
@@ -47,6 +54,9 @@ export function handleAuctionBid_Displaced(
 }
 
 export function handleAuctionBid_Placed(event: AuctionBid_PlacedEvent): void {
+
+  //ENTITY (EVENT ) OBJECT
+
   let entity = new AuctionBid_Placed(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
@@ -62,6 +72,54 @@ export function handleAuctionBid_Placed(event: AuctionBid_PlacedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+  //create a new bid and auction object
+  //saleID int -> hex string > padded with 0 in case it's not an even length
+  //(requirement by subgraph)
+  let saleID = event.params.saleID.toU32()
+  let padded = saleID.toString(16).padStart(2,'0');
+
+  //load up auction object for later use
+
+  const auction = Auction.load(Bytes.fromHexString(padded));
+
+  //BID OBJECT
+  
+ 
+  const bid = new Bid( event.transaction.hash.concatI32(event.logIndex.toI32()));
+  bid.auction = Bytes.fromHexString(padded);
+  bid.saleID = event.params.saleID
+  bid.bidIndex = event.params.bidIndex
+  bid.bidder = event.params.bidder
+  bid.bidamount = event.params.bidamount
+  bid.incentivesDue = event.params.incentivesDue
+  bid.bidTimestamp = event.params.bidTimestamp
+
+  bid.blockNumber = event.block.number
+  bid.blockTimestamp = event.block.timestamp
+  bid.transactionHash = event.transaction.hash
+
+
+  
+
+
+  // Load auction related to this bid and load up the 
+  if(auction) {
+    //save current bid pointer to auction
+    auction.currentBid = bid.id;
+    auction.save()
+
+    bid.price = bid.bidamount.div(auction.tokenID);
+
+    //calculate price
+    //get the bundle size by loading the auction and fetching tokenID == bundle size
+    bid.save()
+  
+
+  }
+  
+
+  
+
 }
 
 export function handleAuctionRegistration_EndTimeUpdated(
@@ -103,6 +161,41 @@ export function handleAuctionRegistration_NewAuction(
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+
+  //create a new project object
+  //add auction under it
+  let project = new Project(event.params.tokenContractAddress);
+  //get IPFS url
+  //let contract = ERC721.bind(event.params.tokenContractAddress);
+  //let tokenURI = contract.tokenURI(BigInt.fromString("0"));
+  //log.info("tokenURI: {}",[tokenURI]);
+  project.ipfs = event.params.tokenContractAddress
+  project.save()
+
+  let saleID = event.params.saleID.toU32()
+  let padded = saleID.toString(16).padStart(2,'0');
+
+  let auction = new Auction(Bytes.fromHexString(padded))
+  auction.project = project.id;
+  // auction.saleID = event.params.saleID
+  auction.tokenContractAddress = event.params.tokenContractAddress
+  auction.tokenID = event.params.tokenID
+  auction.tokenAmount = event.params.tokenAmount
+  auction.tokenKind = event.params.tokenKind
+  auction.gbmPresetIndex = event.params.gbmPresetIndex
+  auction.currencyID = event.params.currencyID
+  auction.startTimestamp = event.params.startTimestamp
+  auction.endTimeStamp = event.params.endTimeStamp
+  auction.beneficiary = event.params.beneficiary
+  auction.startingBid = event.params.startingBid
+
+  auction.blockNumber = event.block.number
+  auction.blockTimestamp = event.block.timestamp
+  auction.transactionHash = event.transaction.hash
+
+
+
+  auction.save()
 }
 
 export function handleAuction_Claimed(event: Auction_ClaimedEvent): void {

@@ -3,6 +3,9 @@
     "Diamond": {
       "address": "0xaB1af0772A7e709B864e7B8F14aB70bc7ea2ad97",
       "startBlock": 4834376
+    },
+    "ERC721": {
+      "address": "0x695a3acbdfab38f589d49e8a00feedeeac5070bc"
     }
   }
 }
