@@ -1,3 +1,7 @@
+schema {
+    mutation: Mutation
+}
+
 type AuctionBid_Displaced @entity(immutable: true) {
   id: Bytes!
   saleID: BigInt! # uint256
@@ -150,46 +154,19 @@ type SaleRegistration_NewSale @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
-type Approval @entity(immutable: true) {
-  id: Bytes!
-  _owner: Bytes! # address
-  _approved: Bytes! # address
-  _tokenId: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type ApprovalForAll @entity(immutable: true) {
-  id: Bytes!
-  _owner: Bytes! # address
-  _operator: Bytes! # address
-  _approved: Boolean! # bool
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type Transfer @entity(immutable: true) {
-  id: Bytes!
-  _from: Bytes! # address
-  _to: Bytes! # address
-  _tokenId: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
 
 type Project @entity(immutable: false) {
   id: Bytes! # tokenContractAddress from Auctions
   auctions: [Auction!] @derivedFrom(field: "project")
   ipfs: Bytes! #IPFS image
+  currentBid: Bid
 
 }
 
 type Auction @entity(immutable: false) {  
 
-  id: Bytes! #saleID
+  id: String!
+  saleID: BigInt!
   project: Project!
   tokenContractAddress: Bytes! # address
   currentBid: Bid
@@ -225,4 +202,3 @@ type Bid @entity(immutable: false) {
   price: BigInt!
 
 }
-

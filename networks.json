@@ -6,6 +6,9 @@
     },
     "ERC721": {
       "address": "0x695a3acbdfab38f589d49e8a00feedeeac5070bc"
+    },
+    "Contract": {
+      "address": "0x2B51eAcD196ac37523515058DF44050fBa39a167"
     }
   }
 }

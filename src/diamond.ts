@@ -1,4 +1,4 @@
-import { ethereum, Bytes, BigInt, ByteArray } from "@graphprotocol/graph-ts"
+import { ethereum, Bytes, BigInt, ByteArray, Address } from "@graphprotocol/graph-ts"
 import { log } from "matchstick-as"
 import {
   AuctionBid_Displaced as AuctionBid_DisplacedEvent,
@@ -32,7 +32,6 @@ import {
   SaleExecuted,
   SaleRegistration_NewSale
 } from "../generated/schema"
-import { ERC721 } from "../generated/ERC721/ERC721"
 
 export function handleAuctionBid_Displaced(
   event: AuctionBid_DisplacedEvent
@@ -75,18 +74,17 @@ export function handleAuctionBid_Placed(event: AuctionBid_PlacedEvent): void {
   //create a new bid and auction object
   //saleID int -> hex string > padded with 0 in case it's not an even length
   //(requirement by subgraph)
-  let saleID = event.params.saleID.toU32()
-  let padded = saleID.toString(16).padStart(2,'0');
+  let saleID = event.params.saleID.toString();
 
   //load up auction object for later use
 
-  const auction = Auction.load(Bytes.fromHexString(padded));
+  const auction = Auction.load(saleID);
 
   //BID OBJECT
-  
- 
-  const bid = new Bid( event.transaction.hash.concatI32(event.logIndex.toI32()));
-  bid.auction = Bytes.fromHexString(padded);
+
+
+  const bid = new Bid(event.transaction.hash.concatI32(event.logIndex.toI32()));
+  bid.auction = saleID;
   bid.saleID = event.params.saleID
   bid.bidIndex = event.params.bidIndex
   bid.bidder = event.params.bidder
@@ -99,11 +97,11 @@ export function handleAuctionBid_Placed(event: AuctionBid_PlacedEvent): void {
   bid.transactionHash = event.transaction.hash
 
 
-  
+
 
 
   // Load auction related to this bid and load up the 
-  if(auction) {
+  if (auction) {
     //save current bid pointer to auction
     auction.currentBid = bid.id;
     auction.save()
@@ -113,12 +111,21 @@ export function handleAuctionBid_Placed(event: AuctionBid_PlacedEvent): void {
     //calculate price
     //get the bundle size by loading the auction and fetching tokenID == bundle size
     bid.save()
-  
+
+    const project = Project.load(auction.tokenContractAddress);
+    if (project) {
+      project.currentBid = bid.id;
+      project.save();
+    }
+
 
   }
-  
+  //add current bid to project
 
-  
+
+
+
+
 
 }
 
@@ -165,18 +172,16 @@ export function handleAuctionRegistration_NewAuction(
   //create a new project object
   //add auction under it
   let project = new Project(event.params.tokenContractAddress);
-  //get IPFS url
-  //let contract = ERC721.bind(event.params.tokenContractAddress);
-  //let tokenURI = contract.tokenURI(BigInt.fromString("0"));
-  //log.info("tokenURI: {}",[tokenURI]);
-  project.ipfs = event.params.tokenContractAddress
+  project.ipfs = event.params.tokenContractAddress;
   project.save()
 
-  let saleID = event.params.saleID.toU32()
-  let padded = saleID.toString(16).padStart(2,'0');
 
-  let auction = new Auction(Bytes.fromHexString(padded))
+  let saleID = event.params.saleID.toString();
+
+
+  let auction = new Auction(saleID)
   auction.project = project.id;
+  auction.saleID = event.params.saleID;
   // auction.saleID = event.params.saleID
   auction.tokenContractAddress = event.params.tokenContractAddress
   auction.tokenID = event.params.tokenID
